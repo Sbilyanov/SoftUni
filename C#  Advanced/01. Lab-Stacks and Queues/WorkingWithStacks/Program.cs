@@ -1,0 +1,12 @@
+﻿using System;
+
+namespace WorkingWithStacks
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+        }
+    }
+}
