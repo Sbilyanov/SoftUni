@@ -9,111 +9,85 @@ namespace _07.KnightGame
         {
             int n = int.Parse(Console.ReadLine());
 
-            char[,] matrix = new char[n, n];
+            string[,] chessBoard = new string[n, n];
 
+            //Populate the board with knights
             for (int row = 0; row < n; row++)
             {
-                char[] rowData = Console.ReadLine().ToCharArray();
+                char[] input = Console.ReadLine().ToCharArray();
 
                 for (int col = 0; col < n; col++)
                 {
-                    matrix[row, col] = rowData[col];
-
+                    chessBoard[row, col] = input[col].ToString();
                 }
             }
 
-           int removedKnights = 0;
+            int knightsForRemove = 0;
+            int strongestKnight = 0;
+            int knightXposition = 0;
+            int knightYposition = 0;
 
             while (true)
             {
-                int maxAttackedKnighs = 0;
-                int knightRow = -1;
-                int knightCol = -1;
-                for (int row = 0; row < n; row++)
+                /*Check for possible moves and count knights which should be removed. The knights with
+                * biggest amount of possibilities to hit another knight are the strongest, we should remove them
+                 * first, until no such knights left. Then if there is no such knight we should stop and print the amount
+                 * of knights for remove.
+                */
+                for (int row = 0; row < chessBoard.GetLength(0); row++)
                 {
-                    for (int col = 0; col < n; col++)
-                    {
-                        char symbol = matrix[row, col];
 
-                        if (symbol != 'K')
+                    for (int col = 0; col < chessBoard.GetLength(1); col++)
+                    {
+                        int hitCounter = 0;
+
+                        if (chessBoard[row, col] == "K")
                         {
-                            continue;
+                            //Arrays of possible moves
+                            int[] horizontalMoves = { 2, 1, -1, -2, -2, -1, 1, 2 };
+                            int[] verticalMoves = { 1, 2, 2, 1, -1, -2, -2, -1 };
+
+                            for (int move = 0; move < 8; move++)
+                            {
+                                //Position after move
+                                int x = row + horizontalMoves[move];
+                                int y = col + verticalMoves[move];
+
+                                //Check if there is another Knight on the way and count the hit
+                                if (x >= 0 && y >= 0 && x < n && y < n && chessBoard[x, y] == "K")
+                                {
+                                    hitCounter++;
+                                }
+                            }
+
+                            //If there is stronger knight replace current data with his data 'cause we're searching for the strongest knight
+                            if (hitCounter > strongestKnight)
+                            {
+                                strongestKnight = hitCounter;
+                                hitCounter = 0;
+                                knightXposition = row;
+                                knightYposition = col;
+                            }
                         }
-                        int count = GetCountOfAttackedKnight(matrix, row, col);
-                     
-                        if (count > maxAttackedKnighs)
-                        {
-                            maxAttackedKnighs = count;
-                            knightRow = row;
-                            knightCol = col;
-                        }               
                     }
                 }
-                if (maxAttackedKnighs == 0)
+
+                //Remove the strongest knight with biggest amount of possibilities to hit another knight
+                if (strongestKnight > 0)
                 {
+                    chessBoard[knightXposition, knightYposition] = "0";
+                    strongestKnight = 0;
+                    knightsForRemove++;
+                }
+                else
+                {
+                    //If there is no strongest knight 
                     break;
                 }
-                matrix[knightRow, knightCol] = '0';
-                removedKnights++;
+
             }
 
-
-            Console.WriteLine(removedKnights);
-        }
-
-
-        private static int GetCountOfAttackedKnight(char[,] matrix, int row, int col)
-        {
-            int count = 0;
-            if (ContainsKnights(matrix, row -2, col -1))
-            {
-                count++;
-            }
-            if (ContainsKnights(matrix, row -2, col + 1))
-            {
-                count++;
-            }
-            if (ContainsKnights(matrix, row - 1, col - 2))
-            {
-                count++;
-            }
-            if (ContainsKnights(matrix, row - 1, col + 2))
-            {
-                count++;
-            }
-            if (ContainsKnights(matrix, row + 1, col -2))
-            {
-                count++;
-            }
-            if (ContainsKnights(matrix, row + 1, col + 2))
-            {
-                count++;
-            }
-            if (ContainsKnights(matrix, row + 2, col - 1))
-            {
-                count++;
-            }
-            if (ContainsKnights(matrix, row - 2, col - 1))
-            {
-                count++;
-            }
-
-            return count;
-
-        }
-
-        private static bool ContainsKnights(char[,] matrix, int row, int col)
-        {
-            if (!CellIsValid(row, col, matrix.GetLength(0)))
-            {
-                return false;
-            }
-            return matrix[row, col] == 'K';
-        }
-
-        private static bool CellIsValid(int row, int col, int n)
-        {
-            return row >= 0 && row < n && col >= 0 && col < n;
+            Console.WriteLine(knightsForRemove);
         }
 
     }
