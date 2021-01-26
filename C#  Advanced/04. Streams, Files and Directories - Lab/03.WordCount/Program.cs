@@ -16,7 +16,8 @@ namespace _03.WordCount
                 {
                     string[] words = readerWords.ReadLine().Split();
 
-                    string[] text = reader.ReadToEnd().Split(new[] { ' ', ',', '.', '!', '?', '-' });
+                    string[] text = reader.ReadToEnd().
+                        Split(new[] { " ", ",", ".", "!", "?", "-",Environment.NewLine },StringSplitOptions.RemoveEmptyEntries);
 
                     for (int i = 0; i < words.Length; i++)
                     {
